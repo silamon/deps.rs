@@ -4,10 +4,9 @@ use rustsec::{
     cargo_lock,
     database::{self, Database},
 };
-use semver::Version;
 
 use crate::models::crates::{
-    AnalyzedDependencies, AnalyzedDependency, CrateDeps, CrateName, CrateRelease,
+    AnalyzedDependencies, AnalyzedDependency, CrateDeps, CrateRelease,
 };
 
 pub struct DependencyAnalyzer {
@@ -24,11 +23,13 @@ impl DependencyAnalyzer {
     }
 
     fn process_single(
-        name: &CrateName,
+        crate_release: &CrateRelease,
         dep: &mut AnalyzedDependency,
-        ver: &Version,
         advisory_db: Option<&Database>,
     ) {
+        let ver = &crate_release.version;
+        let name = &crate_release.name;
+
         if dep.required.matches(ver) {
             if let Some(ref mut current_latest_that_matches) = dep.latest_that_matches {
                 if *current_latest_that_matches < *ver {
@@ -51,6 +52,8 @@ impl DependencyAnalyzer {
                     dep.vulnerabilities = vulnerabilities;
                 }
             }
+
+            dep.is_yanked = crate_release.yanked;
         }
         if ver.pre.is_empty() {
             if let Some(ref mut current_latest) = dep.latest {
@@ -68,25 +71,22 @@ impl DependencyAnalyzer {
         for release in releases.into_iter().filter(|r| !r.yanked) {
             if let Some(main_dep) = self.deps.main.get_mut(&release.name) {
                 DependencyAnalyzer::process_single(
-                    &release.name,
+                    &release,
                     main_dep,
-                    &release.version,
                     advisory_db,
                 )
             }
             if let Some(dev_dep) = self.deps.dev.get_mut(&release.name) {
                 DependencyAnalyzer::process_single(
-                    &release.name,
+                    &release,
                     dev_dep,
-                    &release.version,
                     advisory_db,
                 )
             }
             if let Some(build_dep) = self.deps.build.get_mut(&release.name) {
                 DependencyAnalyzer::process_single(
-                    &release.name,
+                    &release,
                     build_dep,
-                    &release.version,
                     advisory_db,
                 )
             }

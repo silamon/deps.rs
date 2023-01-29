@@ -35,9 +35,6 @@ pub async fn crawl_manifest(
         let (path, raw_manifest) = item?;
         let output = crawler.step(path, raw_manifest)?;
 
-        let engine = engine.clone();
-        let repo_path = repo_path.clone();
-
         for path in output.paths_of_interest {
             let engine = engine.clone();
             let repo_path = repo_path.clone();

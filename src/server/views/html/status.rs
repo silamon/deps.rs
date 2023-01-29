@@ -95,6 +95,11 @@ fn dependency_table(title: &str, deps: &IndexMap<CrateName, AnalyzedDependency>)
                                 { "\u{00A0}" } // non-breaking space
                                 a href="#vulnerabilities" title="has known vulnerabilities" { "⚠️" }
                             }
+
+                            @if dep.is_yanked {
+                                { "\u{00A0}" } // non-breaking space
+                                span title="is yanked" { "🚫" }
+                            }
                         }
                         td class="has-text-right" { code { (dep.required.to_string()) } }
                         td class="has-text-right" {

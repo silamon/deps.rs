@@ -91,6 +91,7 @@ pub struct AnalyzedDependency {
     pub latest_that_matches: Option<Version>,
     pub latest: Option<Version>,
     pub vulnerabilities: Vec<Advisory>,
+    pub is_yanked: bool,
 }
 
 impl AnalyzedDependency {
@@ -100,6 +101,7 @@ impl AnalyzedDependency {
             latest_that_matches: None,
             latest: None,
             vulnerabilities: Vec::new(),
+            is_yanked: false
         }
     }
 
